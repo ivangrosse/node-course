@@ -1,14 +1,15 @@
 const fs = require('fs');
+const chalk = require('chalk');
 
-function getNotes(){
+
+const getNotes = () => {
     console.log('Your notes...');
 }
 
-const addNote = function(title, body){
+const addNote = (title, body) => {
     const notes = loadNotes();
-    const duplicatedNotes = notes.filter(function(note){
-        return note.title === title;
-    });
+    const duplicatedNotes = notes.filter((note) => note.title === title
+    );
 
     if(duplicatedNotes.length === 0){
         notes.push({
@@ -16,18 +17,20 @@ const addNote = function(title, body){
             body: body
         });
         saveNotes(notes);
+        console.log(chalk.green('Note added!!'));
+
     }else{
-        console.log('Note title: ' + title + ' is taken.')
+        console.log(chalk.red('Note title: ' + title + ' is taken.'));
     }
 
     
 };
 
-const saveNotes = function(notes){
+const saveNotes = (notes) => {
     fs.writeFileSync('notes.json', JSON.stringify(notes));
 };
 
-const loadNotes = function(){
+const loadNotes = () => {
     try {
         const parsedJsonData = JSON.parse(fs.readFileSync('notes.json').toString());
         return parsedJsonData; 
@@ -38,13 +41,22 @@ const loadNotes = function(){
     
 };
 
-const removeNote = function(title){
-    /*const notes = loadNotes();
-    const matches = notes.filter(function(note){
-        return note.title === title;
-    });
-
-    if(){};*/
+const removeNote = (title) => {
+    const notes = loadNotes();
+    const notMatches = notes.filter((note) => note.title !== title
+    );
+    if(notes.length === notMatches.length){
+        console.log(chalk.red('That title does not exist'));
+    }else{
+        try {
+            saveNotes(notMatches);    
+            console.log(chalk.green('Note removed!!'));
+        } catch (e) {
+            console.log("The note wasn't removed. ", e);
+        }
+    }
+    
+ 
 };
 
 module.exports = {
